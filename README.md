@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SolidarLink — Frontend
 
-## Getting Started
+Application Next.js 16 (App Router, TypeScript, Tailwind CSS v4) de la plateforme SolidarLink, qui relie associations et bénévoles.
 
-First, run the development server:
+API : dépôt [backPfe](https://github.com/ELKHRAIFI-MOHAMMED/backPfe/tree/v2) (Django REST + Channels).
+
+## Démarrage
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # URL de l'API Django
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Le backend doit tourner sur `http://127.0.0.1:8000` (voir le README du dépôt backPfe).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Contenu |
+|---|---|
+| `/` | Accueil, recherche, statistiques d'impact, causes, prochaines missions |
+| `/missions` | Liste filtrable, vue carte, « près de moi » |
+| `/missions/[id]` | Détail, candidature ou don, agenda `.ics`, signalement |
+| `/associations`, `/associations/[id]` | Annuaire et fiche publique avec avis |
+| `/benevoles/[id]` | Profil public d'un bénévole (badges, avis) |
+| `/connexion`, `/inscription` | Authentification JWT, comptes de démo en un clic |
+| `/espace` | Tableau de bord selon le rôle : bénévole, association ou admin |
+| `/espace/annonce` | Création / modification d'annonce avec position sur la carte |
+| `/messages` | Messagerie temps réel (WebSocket) |
 
-## Learn More
+## Comptes de démo
 
-To learn more about Next.js, take a look at the following resources:
+Mot de passe commun : `Demo1234!`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Admin : `admin@solidarlink.local`
+- Association : `panier_solidaire@asso.solidarlink.local`
+- Bénévole : `emma.martin@mail.solidarlink.local`

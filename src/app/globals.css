@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-creme: #fff8f1;
+  --color-sable: #fbecdc;
+  --color-ink: #1d2a23;
+  --color-ink-soft: #4a5a51;
+  --color-corail: #f26b3a;
+  --color-corail-dark: #d9531f;
+  --color-corail-soft: #ffe3d6;
+  --color-foret: #1f5a43;
+  --color-foret-soft: #dcefe4;
+  --color-soleil: #ffc845;
+  --color-soleil-soft: #fff1c7;
+  --color-lilas: #ece6ff;
+  --color-ligne: #eadfd3;
+
+  --font-display: var(--font-bricolage);
+  --font-sans: var(--font-dm-sans);
+
+  --radius-xl2: 1.25rem;
+  --shadow-carte: 0 1px 0 rgba(29, 42, 35, 0.04), 0 8px 24px -12px rgba(29, 42, 35, 0.18);
+  --shadow-carte-hover: 0 2px 0 rgba(29, 42, 35, 0.05), 0 18px 36px -14px rgba(29, 42, 35, 0.28);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-creme);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- composants réutilisables ---------- */
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition
+    disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2;
+}
+@utility btn-primary {
+  @apply btn bg-corail text-white hover:bg-corail-dark focus-visible:outline-corail;
+}
+@utility btn-secondary {
+  @apply btn bg-foret text-white hover:bg-ink focus-visible:outline-foret;
+}
+@utility btn-ghost {
+  @apply btn border border-ligne bg-white text-ink hover:border-ink;
+}
+@utility btn-sm {
+  @apply px-3.5 py-1.5 text-xs;
+}
+@utility carte {
+  @apply rounded-xl2 border border-ligne bg-white shadow-carte;
+}
+@utility champ {
+  @apply w-full rounded-xl border border-ligne bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/60
+    focus:border-corail focus:outline-none focus:ring-4 focus:ring-corail/15;
+}
+@utility etiquette {
+  @apply mb-1.5 block text-sm font-semibold text-ink;
+}
+@utility pastille {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+}
+@utility conteneur {
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+}
+
+/* soulignement « feutre » des titres */
+.surligne {
+  background-image: linear-gradient(transparent 62%, var(--color-soleil) 62%, var(--color-soleil) 90%, transparent 90%);
+  padding: 0 0.1em;
+}
+
+/* motif de points du hero */
+.motif-points {
+  background-image: radial-gradient(rgba(29, 42, 35, 0.12) 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
+}
+
+.leaflet-container {
+  font-family: var(--font-sans), sans-serif;
+  border-radius: 1.25rem;
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.apparition {
+  animation: apparition 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apparition {
+    animation: none;
+  }
 }
