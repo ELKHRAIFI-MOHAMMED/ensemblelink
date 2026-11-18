@@ -3,7 +3,7 @@
 Application Next.js 16 (App Router, TypeScript, Tailwind CSS v4) d'**EnsembleLink** : bénévolat, collectes de dons et
 activités entre citoyens (sport, lecture, sorties…), au Maroc, en France, au Royaume-Uni, aux États-Unis et au Canada.
 
-API : dépôt [backPfe](https://github.com/ELKHRAIFI-MOHAMMED/backPfe) (Django REST).
+API : dépôt [back.ensemblelink](https://github.com/ELKHRAIFI-MOHAMMED/back.ensemblelink) (Django REST).
 
 ## Développement local
 
@@ -15,7 +15,7 @@ npm run dev                  # http://localhost:3000
 
 ## Déploiement sur Vercel (bêta)
 
-1. **Vercel → Add New → Project → importer ce dépôt** (`solidarlink-frontend`). Framework détecté : Next.js.
+1. **Vercel → Add New → Project → importer ce dépôt** (`ensemblelink`). Framework détecté : Next.js.
 2. **Environment Variables** :
 
    | Variable | Valeur |
