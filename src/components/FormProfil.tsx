@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { useApi } from "@/lib/hooks";
+import { PAYS } from "@/lib/pays";
 import type { Association, Categorie, Citoyen, Competence } from "@/lib/types";
 import { Alerte } from "./ui";
 
@@ -14,6 +15,7 @@ export function FormCitoyen({ initial, onOk, creation }: { initial?: Citoyen | n
     prenom: initial?.prenom ?? "",
     nom: initial?.nom ?? "",
     ville: initial?.ville ?? "",
+    pays: initial?.pays ?? "FR",
     bio: initial?.bio ?? "",
     experiences: initial?.experiences ?? "",
   });
@@ -48,7 +50,10 @@ export function FormCitoyen({ initial, onOk, creation }: { initial?: Citoyen | n
         <Champ label="Prénom" value={f.prenom} onChange={(v) => setF({ ...f, prenom: v })} required />
         <Champ label="Nom" value={f.nom} onChange={(v) => setF({ ...f, nom: v })} required />
       </div>
-      <Champ label="Ville" value={f.ville} onChange={(v) => setF({ ...f, ville: v })} placeholder="Pour vous proposer des missions proches" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <ChoixPays valeur={f.pays} onChange={(v) => setF({ ...f, pays: v })} />
+        <Champ label="Ville" value={f.ville} onChange={(v) => setF({ ...f, ville: v })} placeholder="Pour vous proposer des activités proches" />
+      </div>
       <div>
         <label className="etiquette" htmlFor="bio">En quelques mots</label>
         <textarea id="bio" rows={3} className="champ" value={f.bio} onChange={(e) => setF({ ...f, bio: e.target.value })} placeholder="Ce qui vous motive, vos disponibilités…" />
@@ -73,6 +78,7 @@ export function FormAssociation({ initial, onOk, creation }: { initial?: Associa
   const [f, setF] = useState({
     nom: initial?.nom ?? "",
     ville: initial?.ville ?? "",
+    pays: initial?.pays ?? "FR",
     adresse: initial?.adresse ?? "",
     description: initial?.description ?? "",
     contact: initial?.contact ?? "",
@@ -107,7 +113,8 @@ export function FormAssociation({ initial, onOk, creation }: { initial?: Associa
   return (
     <form onSubmit={soumettre} className="space-y-5">
       <Champ label="Nom de l'association" value={f.nom} onChange={(v) => setF({ ...f, nom: v })} required />
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <ChoixPays valeur={f.pays} onChange={(v) => setF({ ...f, pays: v })} />
         <Champ label="Ville" value={f.ville} onChange={(v) => setF({ ...f, ville: v })} required />
         <Champ label="Adresse" value={f.adresse} onChange={(v) => setF({ ...f, adresse: v })} />
       </div>
@@ -137,6 +144,19 @@ export function FormAssociation({ initial, onOk, creation }: { initial?: Associa
       {erreur && <Alerte>{erreur}</Alerte>}
       <button className="btn-primary w-full" disabled={envoi}>{envoi ? "Enregistrement…" : creation ? "Créer le profil de l'association" : "Enregistrer"}</button>
     </form>
+  );
+}
+
+function ChoixPays({ valeur, onChange }: { valeur: string; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <label htmlFor="pays" className="etiquette">Pays</label>
+      <select id="pays" className="champ" value={valeur} onChange={(e) => onChange(e.target.value)}>
+        {Object.entries(PAYS).map(([code, p]) => (
+          <option key={code} value={code}>{p.nom}</option>
+        ))}
+      </select>
+    </div>
   );
 }
 

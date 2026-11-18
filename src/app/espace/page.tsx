@@ -21,7 +21,7 @@ export default function EspacePage() {
   if (chargement || !me || (!me.profil && me.user.type !== "ADMIN")) return <Chargement />;
 
   return (
-    <div className="conteneur py-10">
+    <div>
       {me.user.type === "ADMIN" ? <EspaceAdmin /> : me.user.type === "ASSOCIATION" ? <EspaceAssociation /> : <EspaceCitoyen />}
     </div>
   );

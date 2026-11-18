@@ -25,7 +25,7 @@ export default function ProfilPage() {
   };
 
   return (
-    <div className="conteneur max-w-2xl py-10">
+    <div className="max-w-2xl">
       <Link href="/espace" className="text-sm font-semibold text-ink-soft hover:text-ink">← Mon espace</Link>
       <h1 className="mb-8 mt-3 text-4xl font-extrabold">Mon profil</h1>
       <div className="carte p-6">

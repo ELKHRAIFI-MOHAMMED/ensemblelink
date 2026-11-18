@@ -7,7 +7,9 @@ import MissionCard from "@/components/MissionCard";
 import { Chargement, Vide, useToast } from "@/components/ui";
 import { TYPES_ANNONCE } from "@/lib/format";
 import { useApi } from "@/lib/hooks";
+import { PAYS, PAYS_PRINCIPAUX } from "@/lib/pays";
 import type { Annonce, AnnonceType, Categorie, Paginated } from "@/lib/types";
+import Drapeau from "@/components/Drapeau";
 
 const CarteMissions = dynamic(() => import("@/components/CarteMissions"), {
   ssr: false,
@@ -67,6 +69,7 @@ export default function MissionsClient() {
 
   const typeActif = params.get("type") as AnnonceType | null;
   const catActive = params.get("categorie");
+  const paysActif = params.get("pays");
   const geoActif = params.has("rayon_km");
   const nbPages = data ? Math.ceil(data.count / 12) : 1;
 
@@ -94,8 +97,19 @@ export default function MissionsClient() {
         </div>
       </div>
 
+      {/* ----- pays */}
+      <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="Pays">
+        <span className="mr-1 text-xs font-bold uppercase tracking-wider text-ink-soft">Pays</span>
+        <Filtre actif={!paysActif} onClick={() => maj({ pays: null })}>🌍 Partout</Filtre>
+        {PAYS_PRINCIPAUX.map((code) => (
+          <Filtre key={code} actif={paysActif === code} onClick={() => maj({ pays: paysActif === code ? null : code, lat: null, lng: null, rayon_km: null })}>
+            <span className="inline-flex items-center gap-1.5"><Drapeau code={code} /> {PAYS[code].nom}</span>
+          </Filtre>
+        ))}
+      </div>
+
       {/* ----- pastilles type & catégorie */}
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-2">
         <Filtre actif={!typeActif} onClick={() => maj({ type: null })}>Tout</Filtre>
         {(Object.keys(TYPES_ANNONCE) as AnnonceType[]).map((t) => (
           <Filtre key={t} actif={typeActif === t} onClick={() => maj({ type: typeActif === t ? null : t })}>

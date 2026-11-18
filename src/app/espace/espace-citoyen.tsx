@@ -11,6 +11,8 @@ import { nombre, plage, STATUTS_CANDIDATURE, TYPES_ANNONCE } from "@/lib/format"
 import { useApi } from "@/lib/hooks";
 import type { Annonce, Candidature, Paginated } from "@/lib/types";
 import { AvisEnAttente, Onglets } from "./commun";
+import MesActivites from "./mes-activites";
+import Drapeau from "@/components/Drapeau";
 
 type Onglet = "a_venir" | "attente" | "passees";
 
@@ -59,7 +61,7 @@ export default function EspaceCitoyen() {
         </div>
         <div className="flex gap-2">
           <Link href={`/benevoles/${profil.id}`} className="btn-ghost">Mon profil public</Link>
-          <Link href="/missions" className="btn-primary">Trouver une mission</Link>
+          <Link href="/missions" className="btn-primary">Trouver une activité</Link>
         </div>
       </div>
 
@@ -88,6 +90,8 @@ export default function EspaceCitoyen() {
           ))}
         </div>
       </section>
+
+      <MesActivites onChange={rechargerMe} />
 
       {/* Candidatures */}
       <section>
@@ -122,7 +126,8 @@ export default function EspaceCitoyen() {
                     </div>
                     <Link href={`/missions/${c.annonce}`} className="mt-2 block font-display text-lg font-bold hover:text-corail">{c.annonce_detail.titre}</Link>
                     <p className="text-sm text-ink-soft">
-                      {c.annonce_detail.association.nom} · 📍 {c.annonce_detail.ville || c.annonce_detail.lieu} · {plage(c.annonce_detail.date_debut, c.annonce_detail.date_fin)}
+                      {c.annonce_detail.organisateur.nom} · <Drapeau code={c.annonce_detail.pays} /> {c.annonce_detail.ville || c.annonce_detail.lieu} ·{" "}
+                      {plage(c.annonce_detail.date_debut, c.annonce_detail.date_fin, c.annonce_detail.fuseau_horaire)}
                       {c.quantite_don && ` · 🎁 ${Number(c.quantite_don)} ${c.annonce_detail.unite_don}`}
                     </p>
                   </div>
@@ -135,14 +140,14 @@ export default function EspaceCitoyen() {
                         📄 Attestation
                       </button>
                     )}
-                    <Link href={`/messages?avec=${c.annonce_detail.association.user}`} className="btn-ghost btn-sm">💬</Link>
+                    <Link href={`/messages?avec=${c.annonce_detail.organisateur.user}`} className="btn-ghost btn-sm" aria-label="Écrire à l'organisateur">💬</Link>
                     {c.statut === "EN_ATTENTE" && (
                       <button className="btn-ghost btn-sm" onClick={() => action(() => api(`/candidatures/mes/${c.id}/`, { method: "DELETE" }), "Candidature retirée")}>Retirer</button>
                     )}
                     {c.statut === "ACCEPTEE" && !passee && (
                       <button
                         className="btn-ghost btn-sm"
-                        onClick={() => confirm("Se désister ? L'association sera prévenue.") && action(() => api(`/candidatures/${c.id}/annuler/`, { method: "POST" }), "Désistement enregistré")}
+                        onClick={() => confirm("Se désister ? L'organisateur sera prévenu.") && action(() => api(`/candidatures/${c.id}/annuler/`, { method: "POST" }), "Désistement enregistré")}
                       >
                         Me désister
                       </button>
@@ -167,7 +172,7 @@ export default function EspaceCitoyen() {
       <Modale ouverte={Boolean(qr)} onFermer={() => setQr(null)} titre="Mon QR de présence">
         {qr?.code_presence && (
           <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-sm text-ink-soft">Présentez ce code à l&apos;association le jour de « {qr.annonce_detail.titre} ».</p>
+            <p className="text-sm text-ink-soft">Présentez ce code à l&apos;organisateur le jour de « {qr.annonce_detail.titre} ».</p>
             <div className="rounded-2xl border border-ligne bg-white p-4">
               <QRCodeSVG value={qr.code_presence} size={220} fgColor="#1d2a23" />
             </div>

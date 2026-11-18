@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Categories, MissionsUne, RechercheHero, StatsLive } from "./accueil-client";
+import { BandeauPays, Categories, MissionsUne, RechercheHero, StatsLive } from "./accueil-client";
+import Drapeau from "@/components/Drapeau";
 
 export default function Accueil() {
   return (
@@ -13,7 +14,9 @@ export default function Accueil() {
         <div className="conteneur relative grid items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="apparition">
             <span className="pastille bg-white text-foret shadow-carte">
-              <span className="h-2 w-2 rounded-full bg-foret" /> Associations vérifiées près de chez vous
+              <span className="h-2 w-2 rounded-full bg-foret" />
+              {["MA", "FR", "GB", "US", "CA"].map((c) => <Drapeau key={c} code={c} />)}
+              Une communauté dans le monde entier
             </span>
             <h1 className="mt-5 text-5xl font-extrabold leading-[1.02] md:text-7xl">
               Un peu de temps,
@@ -21,15 +24,15 @@ export default function Accueil() {
               <span className="surligne">beaucoup</span> d&apos;impact.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">
-              Distribuer des repas, planter des arbres, aider aux devoirs ou donner une couverture : trouvez la mission qui vous
-              ressemble et engagez-vous en deux clics.
+              Aider une association, ou organiser un match de foot, un club de lecture, un pique-nique avec vos voisins :
+              trouvez votre façon de vous engager et de rencontrer du monde, en deux clics.
             </p>
             <RechercheHero />
             <p className="mt-4 text-sm text-ink-soft">
               Populaire :{" "}
               {[
+                ["Activités entre citoyens", "/missions?type=ACTIVITE"],
                 ["Aide alimentaire", "/missions?search=repas"],
-                ["Environnement", "/missions?search=nettoyage"],
                 ["Collectes de dons", "/missions?type=DON"],
               ].map(([lib, href], i) => (
                 <span key={href}>
@@ -97,6 +100,40 @@ export default function Accueil() {
         <MissionsUne />
       </section>
 
+      {/* ------------------------------------------------------------ ACTIVITÉS ENTRE CITOYENS */}
+      <section className="conteneur mt-20">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-widest text-corail">Entre citoyens</p>
+            <h2 className="mt-1 text-3xl font-extrabold md:text-4xl">Foot, lecture, pique-nique… rejoignez le mouvement</h2>
+            <p className="mt-2 max-w-2xl text-ink-soft">
+              Chaque citoyen peut proposer une activité. Les participants sont réunis dans un groupe de discussion qui se ferme
+              automatiquement à la fin.
+            </p>
+          </div>
+          <Link href="/espace/annonce" className="btn-primary">+ Proposer une activité</Link>
+        </div>
+        <MissionsUne filtre="&type=ACTIVITE" />
+      </section>
+
+      {/* ------------------------------------------------------------ INTERNATIONAL */}
+      <section className="conteneur mt-20">
+        <div className="relative overflow-hidden rounded-[2rem] bg-ink px-8 py-12 text-white md:px-14">
+          <div className="motif-points absolute inset-0 opacity-10" aria-hidden />
+          <div className="relative grid items-center gap-8 md:grid-cols-[1.1fr_1fr]">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-widest text-soleil">Partout dans le monde</p>
+              <h2 className="mt-1 text-3xl font-extrabold md:text-4xl">De Casablanca à Vancouver</h2>
+              <p className="mt-3 max-w-lg text-white/70">
+                Associations et citoyens au Maroc, en France, au Royaume-Uni, aux États-Unis et au Canada. Chaque activité
+                s&apos;affiche à l&apos;heure locale de son pays.
+              </p>
+            </div>
+            <BandeauPays />
+          </div>
+        </div>
+      </section>
+
       {/* ------------------------------------------------------------ COMMENT ÇA MARCHE */}
       <section id="comment" className="mt-24 scroll-mt-20 bg-foret py-20 text-white">
         <div className="conteneur">
@@ -105,7 +142,7 @@ export default function Accueil() {
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {[
               ["1", "Je trouve ma mission", "Filtrez par cause, ville ou compétence, ou laissez-nous vous recommander des missions qui vous correspondent."],
-              ["2", "Je postule en un clic", "L'association reçoit votre candidature en temps réel et vous répond. Vous échangez directement par messagerie."],
+              ["2", "Je participe en un clic", "Inscription immédiate ou validée par l'organisateur. Vous rejoignez automatiquement le groupe de discussion de l'activité."],
               ["3", "Mon engagement est reconnu", "Le jour J, l'association scanne votre QR code : vos heures sont validées, vous gagnez des badges et une attestation PDF."],
             ].map(([n, t, d]) => (
               <div key={n} className="rounded-xl2 border border-white/10 bg-white/5 p-6">

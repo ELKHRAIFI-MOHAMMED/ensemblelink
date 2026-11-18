@@ -49,6 +49,16 @@ export default function EspaceAssociation() {
     }
   };
 
+  const creerGroupe = async (a: Annonce) => {
+    try {
+      await api(`/annonces/${a.id}/groupe/`, { method: "POST", body: {} });
+      toast("Groupe créé : les bénévoles acceptés y sont ajoutés automatiquement 💬");
+      annonces.recharger();
+    } catch (e) {
+      toast((e as Error).message, "erreur");
+    }
+  };
+
   const supprimer = async (a: Annonce) => {
     if (!confirm(`Supprimer définitivement « ${a.titre} » ?`)) return;
     try {
@@ -131,7 +141,7 @@ export default function EspaceAssociation() {
                     </Link>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold">{c.annonce_detail.titre}</p>
-                      <p className="text-xs text-ink-soft">{plage(c.annonce_detail.date_debut, c.annonce_detail.date_fin)}{c.quantite_don && ` · 🎁 ${Number(c.quantite_don)} ${c.annonce_detail.unite_don}`}</p>
+                      <p className="text-xs text-ink-soft">{plage(c.annonce_detail.date_debut, c.annonce_detail.date_fin, c.annonce_detail.fuseau_horaire)}{c.quantite_don && ` · 🎁 ${Number(c.quantite_don)} ${c.annonce_detail.unite_don}`}</p>
                       {c.message && <p className="mt-1 line-clamp-2 text-sm italic text-ink-soft">« {c.message} »</p>}
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -173,10 +183,17 @@ export default function EspaceAssociation() {
                         <Link href={`/missions/${a.id}`} className="font-semibold hover:text-corail">{a.titre}</Link>
                         <span className={`pastille ml-2 ${TYPES_ANNONCE[a.type].classe}`}>{TYPES_ANNONCE[a.type].libelle}</span>
                       </td>
-                      <td className="text-ink-soft">{plage(a.date_debut, a.date_fin)}</td>
+                      <td className="text-ink-soft">{plage(a.date_debut, a.date_fin, a.fuseau_horaire)}</td>
                       <td>{a.type === "DON" ? `${a.quantite_collectee} / ${a.objectif_don ? Number(a.objectif_don) : "∞"} ${a.unite_don}` : `${a.places_prises} / ${a.nombre_places ?? "∞"}`}</td>
                       <td>{a.est_terminee ? <span className="pastille bg-sable text-ink-soft">Terminée</span> : a.est_active ? <span className="pastille bg-foret-soft text-foret">En ligne</span> : <span className="pastille bg-ink text-white">Clôturée</span>}</td>
                       <td className="space-x-1 whitespace-nowrap px-5 text-right">
+                        {a.groupe ? (
+                          <Link href={`/messages?groupe=${a.groupe.id}`} className="btn-ghost btn-sm" title="Groupe de discussion">{a.groupe.est_ferme ? "🔒" : "💬"}</Link>
+                        ) : (
+                          !a.est_terminee && a.type !== "DON" && (
+                            <button className="btn-ghost btn-sm" title="Créer le groupe des bénévoles" onClick={() => creerGroupe(a)}>+ 💬</button>
+                          )
+                        )}
                         <Link href={`/espace/annonce?id=${a.id}`} className="btn-ghost btn-sm">Modifier</Link>
                         {!a.est_terminee && <button className="btn-ghost btn-sm" onClick={() => basculerAnnonce(a)}>{a.est_active ? "Clôturer" : "Rouvrir"}</button>}
                         <button className="btn-ghost btn-sm text-[#a32626]" onClick={() => supprimer(a)}>Supprimer</button>

@@ -4,20 +4,39 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Avatar, Chargement, Etoiles, Vide } from "@/components/ui";
 import { useApi } from "@/lib/hooks";
+import { PAYS, PAYS_PRINCIPAUX } from "@/lib/pays";
 import type { Association, Paginated } from "@/lib/types";
+import Drapeau from "@/components/Drapeau";
 
 export default function AssociationsClient() {
   const [recherche, setRecherche] = useState("");
   const [q, setQ] = useState("");
+  const [pays, setPays] = useState("");
   useEffect(() => {
     const t = setTimeout(() => setQ(recherche), 300);
     return () => clearTimeout(t);
   }, [recherche]);
 
-  const { data, chargement } = useApi<Paginated<Association>>(`/association/?page_size=50&search=${encodeURIComponent(q)}`);
+  const { data, chargement } = useApi<Paginated<Association>>(`/association/?page_size=50&search=${encodeURIComponent(q)}${pays ? `&pays=${pays}` : ""}`);
 
   return (
     <div className="mt-8">
+      <div className="mb-4 flex flex-wrap gap-2">
+        {["", ...PAYS_PRINCIPAUX].map((code) => (
+          <button
+            key={code || "tous"}
+            onClick={() => setPays(code)}
+            aria-pressed={pays === code}
+            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${pays === code ? "border-ink bg-ink text-white" : "border-ligne bg-white text-ink-soft hover:border-ink"}`}
+          >
+            {code ? (
+              <span className="inline-flex items-center gap-1.5"><Drapeau code={code} /> {PAYS[code].nom}</span>
+            ) : (
+              "🌍 Tous les pays"
+            )}
+          </button>
+        ))}
+      </div>
       <label className="carte flex max-w-md items-center gap-2 px-4">
         <span aria-hidden>🔎</span>
         <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Nom, ville, cause…" aria-label="Rechercher une association" className="w-full bg-transparent py-3 text-sm outline-none" />
@@ -36,7 +55,7 @@ export default function AssociationsClient() {
                   <Avatar nom={a.nom} src={a.logo} taille={56} carre />
                   <div className="min-w-0">
                     <h2 className="truncate font-display text-lg font-bold group-hover:text-corail">{a.nom}</h2>
-                    <p className="text-sm text-ink-soft">📍 {a.ville || "France"}</p>
+                    <p className="flex items-center gap-1.5 text-sm text-ink-soft"><Drapeau code={a.pays} /> {a.ville}</p>
                   </div>
                 </div>
                 <p className="mt-4 line-clamp-3 flex-1 text-sm leading-relaxed text-ink-soft">{a.description}</p>

@@ -10,7 +10,8 @@ import type { Notification, Paginated } from "@/lib/types";
 import { Avatar, Logo, useToast } from "./ui";
 
 const LIENS = [
-  { href: "/missions", libelle: "Trouver une mission" },
+  { href: "/missions", libelle: "Missions" },
+  { href: "/missions?type=ACTIVITE", libelle: "Activités" },
   { href: "/associations", libelle: "Associations" },
   { href: "/#comment", libelle: "Comment ça marche" },
 ];
@@ -75,7 +76,12 @@ export default function Header() {
                     </p>
                     {[
                       ["/espace", "Mon espace"],
-                      ...(me.user.type !== "ADMIN" ? [["/espace/profil", "Modifier mon profil"]] : []),
+                      ...(me.user.type !== "ADMIN"
+                        ? [
+                            ["/espace/historique", "Mon historique"],
+                            ["/espace/profil", "Modifier mon profil"],
+                          ]
+                        : []),
                       ["/messages", "Messagerie"],
                     ].map(([href, lib]) => (
                       <Link key={href} href={href} onClick={() => setMenu(false)} role="menuitem" className="block rounded-lg px-3 py-2 text-sm hover:bg-sable">

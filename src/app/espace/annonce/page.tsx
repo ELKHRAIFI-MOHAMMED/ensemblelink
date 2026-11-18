@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { TYPES_ANNONCE, versInputDate } from "@/lib/format";
 import { useApi } from "@/lib/hooks";
+import { libelleFuseau, PAYS } from "@/lib/pays";
 import type { Annonce, AnnonceType, Categorie, Competence } from "@/lib/types";
 
 const ChoixPosition = dynamic(() => import("@/components/ChoixPosition"), { ssr: false, loading: () => <div className="h-[260px] animate-pulse rounded-xl2 bg-sable" /> });
@@ -25,6 +26,8 @@ const VIDE = {
   nombre_places: "",
   objectif_don: "",
   unite_don: "",
+  pays: "FR",
+  fuseau_horaire: "Europe/Paris",
 };
 
 export default function FormAnnoncePage() {
@@ -40,12 +43,29 @@ export default function FormAnnoncePage() {
   const [comp, setComp] = useState<number[]>([]);
   const [pos, setPos] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
   const [image, setImage] = useState<File | null>(null);
+  const [inscriptionAuto, setInscriptionAuto] = useState(false);
+  const estCitoyen = me?.user.type === "CITOYEN";
   const [erreur, setErreur] = useState<string | null>(null);
   const [envoi, setEnvoi] = useState(false);
 
   useEffect(() => {
-    if (!authCharge && me?.user.type !== "ASSOCIATION") router.replace("/espace");
+    if (!authCharge && me?.user.type !== "ASSOCIATION" && me?.user.type !== "CITOYEN") router.replace("/espace");
   }, [authCharge, me, router]);
+
+  // Nouvelle annonce : pays du profil, type « Activité » pour un citoyen (inscription libre par défaut)
+  useEffect(() => {
+    if (id || !me?.profil) return;
+    const pays = (me.profil as { pays?: string }).pays || "FR";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setF((prev) => ({
+      ...prev,
+      pays,
+      fuseau_horaire: PAYS[pays]?.fuseaux[0] ?? "Europe/Paris",
+      ville: prev.ville || (me.profil as { ville?: string }).ville || "",
+      type: me.user.type === "CITOYEN" ? "ACTIVITE" : prev.type,
+    }));
+    setInscriptionAuto(me.user.type === "CITOYEN");
+  }, [id, me]);
 
   useEffect(() => {
     if (!existante) return;
@@ -57,12 +77,15 @@ export default function FormAnnoncePage() {
       categorie: existante.categorie ? String(existante.categorie) : "",
       lieu: existante.lieu,
       ville: existante.ville,
-      date_debut: versInputDate(existante.date_debut),
-      date_fin: versInputDate(existante.date_fin),
+      date_debut: versInputDate(existante.date_debut, existante.fuseau_horaire),
+      date_fin: versInputDate(existante.date_fin, existante.fuseau_horaire),
       nombre_places: existante.nombre_places ? String(existante.nombre_places) : "",
       objectif_don: existante.objectif_don ? String(Number(existante.objectif_don)) : "",
       unite_don: existante.unite_don,
+      pays: existante.pays,
+      fuseau_horaire: existante.fuseau_horaire,
     });
+    setInscriptionAuto(existante.inscription_automatique);
     setComp(existante.competences_requises);
     setPos({ lat: existante.latitude ? Number(existante.latitude) : null, lng: existante.longitude ? Number(existante.longitude) : null });
   }, [existante]);
@@ -80,6 +103,7 @@ export default function FormAnnoncePage() {
       if (k === "objectif_don" && f.type !== "DON") return;
       if (v !== "" || id) fd.append(k, v);
     });
+    fd.append("inscription_automatique", String(f.type !== "DON" && inscriptionAuto));
     comp.forEach((c) => fd.append("competences_requises", String(c)));
     if (pos.lat !== null && pos.lng !== null) {
       fd.append("latitude", pos.lat.toFixed(6));
@@ -101,15 +125,23 @@ export default function FormAnnoncePage() {
   };
 
   return (
-    <div className="conteneur max-w-3xl py-10">
+    <div className="max-w-3xl">
       <Link href="/espace" className="text-sm font-semibold text-ink-soft hover:text-ink">← Mon espace</Link>
-      <h1 className="mt-3 text-4xl font-extrabold">{id ? "Modifier l'annonce" : "Publier une annonce"}</h1>
+      <h1 className="mt-3 text-4xl font-extrabold">
+        {id ? "Modifier l'annonce" : estCitoyen ? "Proposer une activité" : "Publier une annonce"}
+      </h1>
+      {estCitoyen && !id && (
+        <p className="mt-2 text-ink-soft">
+          Match de foot, club de lecture, pique-nique, randonnée, soirée jeux… Proposez n&apos;importe quelle activité, les
+          autres citoyens peuvent la rejoindre.
+        </p>
+      )}
 
       <form onSubmit={soumettre} className="mt-8 space-y-8">
         <fieldset className="carte space-y-5 p-6">
           <legend className="sr-only">Type</legend>
-          <p className="etiquette">Type d&apos;annonce</p>
-          <div className="grid gap-3 sm:grid-cols-3">
+          {!estCitoyen && <p className="etiquette">Type d&apos;annonce</p>}
+          <div className={`grid gap-3 sm:grid-cols-4 ${estCitoyen ? "hidden" : ""}`}>
             {(Object.keys(TYPES_ANNONCE) as AnnonceType[]).map((t) => (
               <button type="button" key={t} onClick={() => setF({ ...f, type: t })} aria-pressed={f.type === t} className={`rounded-2xl border p-4 text-left transition ${f.type === t ? "border-corail bg-corail-soft/50 ring-4 ring-corail/10" : "border-ligne hover:border-ink"}`}>
                 <span className="text-2xl">{TYPES_ANNONCE[t].emoji}</span>
@@ -119,7 +151,7 @@ export default function FormAnnoncePage() {
           </div>
           <div>
             <label className="etiquette" htmlFor="titre">Titre</label>
-            <input id="titre" className="champ" required maxLength={255} value={f.titre} onChange={set("titre")} placeholder="ex. Distribution de repas chauds" />
+            <input id="titre" className="champ" required maxLength={255} value={f.titre} onChange={set("titre")} placeholder={estCitoyen ? "ex. Match de foot du dimanche" : "ex. Distribution de repas chauds"} />
           </div>
           <div>
             <label className="etiquette" htmlFor="desc">Description</label>
@@ -138,6 +170,27 @@ export default function FormAnnoncePage() {
           <h2 className="font-display text-lg font-bold">Quand et où ?</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
+              <label className="etiquette" htmlFor="pays">Pays</label>
+              <select
+                id="pays"
+                className="champ"
+                value={f.pays}
+                onChange={(e) => setF({ ...f, pays: e.target.value, fuseau_horaire: PAYS[e.target.value].fuseaux[0] })}
+              >
+                {Object.entries(PAYS).map(([code, p]) => (
+                  <option key={code} value={code}>{p.nom}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="etiquette" htmlFor="tz">Fuseau horaire</label>
+              <select id="tz" className="champ" value={f.fuseau_horaire} onChange={set("fuseau_horaire")} disabled={(PAYS[f.pays]?.fuseaux.length ?? 1) < 2}>
+                {(PAYS[f.pays]?.fuseaux ?? [f.fuseau_horaire]).map((tz) => (
+                  <option key={tz} value={tz}>{libelleFuseau(tz)}</option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="etiquette" htmlFor="debut">Début</label>
               <input id="debut" type="datetime-local" className="champ" required value={f.date_debut} onChange={set("date_debut")} />
             </div>
@@ -145,6 +198,7 @@ export default function FormAnnoncePage() {
               <label className="etiquette" htmlFor="fin">Fin</label>
               <input id="fin" type="datetime-local" className="champ" required min={f.date_debut} value={f.date_fin} onChange={set("date_fin")} />
             </div>
+            <p className="-mt-2 text-xs text-ink-soft sm:col-span-2">Heures locales du lieu ({libelleFuseau(f.fuseau_horaire)}).</p>
             <div>
               <label className="etiquette" htmlFor="lieu">Lieu</label>
               <input id="lieu" className="champ" required value={f.lieu} onChange={set("lieu")} placeholder="Adresse ou nom du lieu" />
@@ -155,9 +209,16 @@ export default function FormAnnoncePage() {
             </div>
           </div>
           <div>
-            <p className="etiquette">Position sur la carte <span className="font-normal text-ink-soft">(cliquez pour placer la mission)</span></p>
+            <p className="etiquette">Position sur la carte <span className="font-normal text-ink-soft">(cliquez pour placer le lieu)</span></p>
             <div className="overflow-hidden rounded-xl2 border border-ligne">
-              <ChoixPosition lat={pos.lat} lng={pos.lng} onChoix={(lat, lng) => setPos({ lat, lng })} />
+              <ChoixPosition
+                key={pos.lat === null ? f.pays : "position"}
+                lat={pos.lat}
+                lng={pos.lng}
+                centre={PAYS[f.pays]?.centre}
+                zoom={PAYS[f.pays]?.zoom}
+                onChoix={(lat, lng) => setPos({ lat, lng })}
+              />
             </div>
             {pos.lat !== null && (
               <button type="button" className="mt-2 text-xs text-ink-soft underline" onClick={() => setPos({ lat: null, lng: null })}>Retirer la position</button>
@@ -166,7 +227,9 @@ export default function FormAnnoncePage() {
         </fieldset>
 
         <fieldset className="carte space-y-5 p-6">
-          <h2 className="font-display text-lg font-bold">{f.type === "DON" ? "Objectif de collecte" : "Bénévoles"}</h2>
+          <h2 className="font-display text-lg font-bold">
+            {f.type === "DON" ? "Objectif de collecte" : f.type === "ACTIVITE" ? "Participants" : "Bénévoles"}
+          </h2>
           {f.type === "DON" ? (
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -182,6 +245,15 @@ export default function FormAnnoncePage() {
             <div>
               <label className="etiquette" htmlFor="places">Nombre de places</label>
               <input id="places" type="number" min="1" className="champ max-w-40" value={f.nombre_places} onChange={set("nombre_places")} placeholder="Illimité" />
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-ligne p-4">
+                <input type="checkbox" className="mt-1 h-4 w-4 accent-corail" checked={inscriptionAuto} onChange={(e) => setInscriptionAuto(e.target.checked)} />
+                <span>
+                  <span className="block text-sm font-semibold">Inscription libre</span>
+                  <span className="text-xs text-ink-soft">
+                    Les participants sont acceptés immédiatement (dans la limite des places). Sinon, vous validez chaque demande.
+                  </span>
+                </span>
+              </label>
             </div>
           )}
           <div>
@@ -206,7 +278,7 @@ export default function FormAnnoncePage() {
         {erreur && <Alerte>{erreur}</Alerte>}
         <div className="flex justify-end gap-3">
           <Link href="/espace" className="btn-ghost">Annuler</Link>
-          <button className="btn-primary" disabled={envoi}>{envoi ? "Enregistrement…" : id ? "Enregistrer" : "Publier l'annonce"}</button>
+          <button className="btn-primary" disabled={envoi}>{envoi ? "Enregistrement…" : id ? "Enregistrer" : estCitoyen ? "Publier l'activité" : "Publier l'annonce"}</button>
         </div>
       </form>
     </div>

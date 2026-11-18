@@ -36,7 +36,7 @@ export default function CarteMissions({ annonces, hauteur = 520 }: { annonces: A
 
   return (
     <div className="carte overflow-hidden p-1.5">
-      <MapContainer center={[46.6, 2.4]} zoom={6} scrollWheelZoom style={{ height: hauteur, width: "100%" }}>
+      <MapContainer center={[38, -30]} zoom={2} scrollWheelZoom style={{ height: hauteur, width: "100%" }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -50,9 +50,9 @@ export default function CarteMissions({ annonces, hauteur = 520 }: { annonces: A
           >
             <Popup>
               <div className="min-w-48">
-                <p className="text-xs text-gray-500">{a.association.nom}</p>
+                <p className="text-xs text-gray-500">{a.organisateur.nom}</p>
                 <p className="font-bold">{a.titre}</p>
-                <p className="my-1 text-xs">{plage(a.date_debut, a.date_fin)}</p>
+                <p className="my-1 text-xs">{plage(a.date_debut, a.date_fin, a.fuseau_horaire)}</p>
                 <Link href={`/missions/${a.id}`} className="font-semibold text-[#d9531f]">
                   Voir la mission →
                 </Link>

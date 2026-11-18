@@ -1,5 +1,5 @@
 export type UserType = "ADMIN" | "ASSOCIATION" | "CITOYEN";
-export type AnnonceType = "EVENEMENT" | "DON" | "APPEL_BENEVOLAT";
+export type AnnonceType = "EVENEMENT" | "DON" | "APPEL_BENEVOLAT" | "ACTIVITE";
 export type StatutCandidature = "EN_ATTENTE" | "ACCEPTEE" | "REFUSEE" | "ANNULEE";
 export type StatutVerification = "EN_ATTENTE" | "VERIFIEE" | "REJETEE";
 
@@ -47,6 +47,7 @@ export interface AssociationMini {
   nom: string;
   logo: string | null;
   ville: string;
+  pays: string;
   statut_verification: StatutVerification;
 }
 
@@ -80,6 +81,7 @@ export interface Citoyen {
   bio: string;
   experiences: string;
   ville: string;
+  pays: string;
   photo: string | null;
   competences: number[];
   centres_interet: number[];
@@ -88,12 +90,37 @@ export interface Citoyen {
   album: PhotoAlbum[];
 }
 
+/** Organisateur unifié : une association ou un citoyen (activités). */
+export interface Organisateur {
+  type: "ASSOCIATION" | "CITOYEN";
+  user: number;
+  profil_id: number;
+  nom: string;
+  avatar: string | null;
+  ville: string;
+  pays: string;
+  verifie: boolean;
+}
+
+export interface GroupeResume {
+  id: number;
+  nom: string;
+  est_ferme: boolean;
+  suis_membre: boolean;
+}
+
 export interface Annonce {
   id: number;
   titre: string;
   description: string;
   type: AnnonceType;
-  association: AssociationMini;
+  association: AssociationMini | null;
+  organisateur: Organisateur;
+  est_organisateur: boolean;
+  pays: string;
+  fuseau_horaire: string;
+  inscription_automatique: boolean;
+  groupe: GroupeResume | null;
   categorie: number | null;
   categorie_detail: Categorie | null;
   competences_requises: number[];
@@ -130,10 +157,13 @@ export interface Candidature {
     ville: string;
     date_debut: string;
     date_fin: string;
-    association: AssociationMini;
+    pays: string;
+    fuseau_horaire: string;
+    association: AssociationMini | null;
+    organisateur: Organisateur;
     unite_don: string;
   };
-  citoyen: { id: number; user: number; prenom: string; nom: string; ville: string; photo: string | null };
+  citoyen: { id: number; user: number; prenom: string; nom: string; ville: string; pays: string; photo: string | null };
   statut: StatutCandidature;
   message: string;
   date_candidature: string;
@@ -158,6 +188,8 @@ export interface StatsCitoyen {
   heures_benevolat: number;
   missions_realisees: number;
   dons_effectues: number;
+  activites_rejointes: number;
+  activites_organisees: number;
   candidatures_total: number;
   candidatures_en_attente: number;
   note_moyenne: number | null;
@@ -182,6 +214,8 @@ export interface StatsGlobales {
   benevoles: number;
   missions: number;
   missions_actives: number;
+  activites: number;
+  pays: number;
   heures_benevolat: number;
   engagements: number;
 }
@@ -247,4 +281,94 @@ export interface Me {
   user: User;
   profil: (Association | Citoyen) | null;
   stats: (StatsCitoyen | StatsAssociation) | null;
+}
+
+/* ---------------------------------------------------------------- groupes de discussion */
+export interface Groupe {
+  id: number;
+  nom: string;
+  annonce: Candidature["annonce_detail"];
+  est_ferme: boolean;
+  date_fermeture: string | null;
+  date_creation: string;
+  nb_membres?: number;
+  mon_role: "ORGANISATEUR" | "MEMBRE" | null;
+  non_lus: number;
+  dernier_message: { contenu: string; date: string; systeme: boolean } | null;
+}
+
+export interface MembreGroupe {
+  user: UserMini;
+  role: "ORGANISATEUR" | "MEMBRE";
+  date_ajout: string;
+}
+
+export interface MessageGroupe {
+  id: number;
+  auteur: UserMini | { id: number; nom_affiche: string } | null;
+  contenu: string;
+  systeme: boolean;
+  date_envoi: string;
+  is_own?: boolean;
+}
+
+/* ---------------------------------------------------------------- historique personnel */
+export type CategorieHistorique = "ORGANISEE" | "PARTICIPATION" | "BENEVOLAT" | "DON" | "AVIS_DONNE" | "AVIS_RECU";
+
+export interface EvenementHistorique {
+  id: string;
+  categorie: CategorieHistorique;
+  date: string;
+  date_action: string;
+  statut: StatutCandidature | "A_VENIR" | "TERMINEE" | "CLOTUREE" | "PUBLIE";
+  annonce: Candidature["annonce_detail"];
+  details: {
+    participants?: number;
+    places?: number | null;
+    demandes?: number;
+    groupe?: { id: number; est_ferme: boolean } | null;
+    icone?: string;
+    candidature?: number;
+    terminee?: boolean;
+    presence_confirmee?: boolean;
+    heures?: number;
+    note_engagement?: number | null;
+    quantite_don?: number | null;
+    unite_don?: string;
+    attestation?: boolean;
+    note?: number;
+    commentaire?: string;
+    personne?: string;
+  };
+}
+
+export interface Historique {
+  resume: {
+    organisees: number;
+    participations: number;
+    benevolat: number;
+    dons: number;
+    avis_recus: number;
+    avis_donnes: number;
+    heures: number;
+    a_venir: number;
+  };
+  evenements: EvenementHistorique[];
+}
+
+/* ---------------------------------------------------------------- jour J */
+export interface EvenementJourJ {
+  annonce: Candidature["annonce_detail"];
+  role: "ORGANISATEUR" | "PARTICIPANT";
+  en_cours: boolean;
+  lieu: string;
+  latitude: string | null;
+  longitude: string | null;
+  icone: string;
+  participants: number;
+  places: number | null;
+  groupe: { id: number; est_ferme: boolean } | null;
+  candidature: number | null;
+  code_presence: string | null;
+  presence_confirmee: boolean;
 }

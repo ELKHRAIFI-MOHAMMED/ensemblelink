@@ -5,9 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Alerte } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
+import Drapeau from "@/components/Drapeau";
 
 const DEMO = [
-  { libelle: "Bénévole", ident: "emma.martin", emoji: "🙋" },
+  { libelle: "Bénévole · France", ident: "emma.martin", emoji: "🙋", pays: "FR" },
+  { libelle: "Citoyen organisateur · Maroc", ident: "yassine.elamrani", emoji: "⚽", pays: "MA" },
+  { libelle: "Citizen · United Kingdom", ident: "oliver.smith", emoji: "📖", pays: "GB" },
   { libelle: "Association", ident: "panier_solidaire", emoji: "🏛️" },
   { libelle: "Admin", ident: "admin", emoji: "🛡️" },
 ];
@@ -80,7 +83,7 @@ export default function ConnexionPage() {
             >
               <span className="text-2xl">{d.emoji}</span>
               <span>
-                <span className="block font-semibold">{d.libelle}</span>
+                <span className="flex items-center gap-2 font-semibold">{d.libelle} {d.pays && <Drapeau code={d.pays} libelle />}</span>
                 <span className="text-xs text-white/60">{d.ident}</span>
               </span>
               <span className="ml-auto text-soleil">→</span>

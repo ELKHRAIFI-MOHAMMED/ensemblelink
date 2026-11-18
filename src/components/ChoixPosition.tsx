@@ -17,9 +17,21 @@ function Clic({ onChoix }: { onChoix: (lat: number, lng: number) => void }) {
 }
 
 /** Cliquez sur la carte pour placer la mission. */
-export default function ChoixPosition({ lat, lng, onChoix }: { lat: number | null; lng: number | null; onChoix: (lat: number, lng: number) => void }) {
+export default function ChoixPosition({
+  lat,
+  lng,
+  onChoix,
+  centre = [46.6, 2.4],
+  zoom = 5,
+}: {
+  lat: number | null;
+  lng: number | null;
+  onChoix: (lat: number, lng: number) => void;
+  centre?: [number, number];
+  zoom?: number;
+}) {
   return (
-    <MapContainer center={lat && lng ? [lat, lng] : [46.6, 2.4]} zoom={lat ? 13 : 5} style={{ height: 260, width: "100%" }}>
+    <MapContainer center={lat && lng ? [lat, lng] : centre} zoom={lat ? 13 : zoom} style={{ height: 260, width: "100%" }}>
       <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <Clic onChoix={onChoix} />
       {lat && lng && <Marker position={[lat, lng]} icon={icone} />}

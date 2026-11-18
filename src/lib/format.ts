@@ -1,18 +1,30 @@
 import type { AnnonceType, StatutCandidature, StatutVerification } from "./types";
 
-const fmtDate = new Intl.DateTimeFormat("fr-FR", { weekday: "short", day: "numeric", month: "short" });
-const fmtHeure = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" });
-const fmtLong = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+/* Les dates d'une activité s'affichent dans SON fuseau horaire (un match à New York est à 18h à New York,
+   quel que soit le pays de la personne qui consulte). `tz` absent = fuseau du navigateur. */
+const cache = new Map<string, Intl.DateTimeFormat>();
+function fmt(opts: Intl.DateTimeFormatOptions, tz?: string) {
+  const cle = JSON.stringify(opts) + (tz ?? "");
+  let f = cache.get(cle);
+  if (!f) {
+    try {
+      f = new Intl.DateTimeFormat("fr-FR", { ...opts, ...(tz ? { timeZone: tz } : {}) });
+    } catch {
+      f = new Intl.DateTimeFormat("fr-FR", opts);
+    }
+    cache.set(cle, f);
+  }
+  return f;
+}
 
-export const dateCourte = (iso: string) => fmtDate.format(new Date(iso));
-export const heure = (iso: string) => fmtHeure.format(new Date(iso));
-export const dateLongue = (iso: string) => fmtLong.format(new Date(iso));
+export const dateCourte = (iso: string, tz?: string) => fmt({ weekday: "short", day: "numeric", month: "short" }, tz).format(new Date(iso));
+export const heure = (iso: string, tz?: string) => fmt({ hour: "2-digit", minute: "2-digit" }, tz).format(new Date(iso));
+export const dateLongue = (iso: string, tz?: string) => fmt({ day: "numeric", month: "long", year: "numeric" }, tz).format(new Date(iso));
+const jour = (iso: string, tz?: string) => fmt({ year: "numeric", month: "2-digit", day: "2-digit" }, tz).format(new Date(iso));
 
-export function plage(debut: string, fin: string) {
-  const d = new Date(debut);
-  const f = new Date(fin);
-  if (d.toDateString() === f.toDateString()) return `${dateCourte(debut)} · ${heure(debut)} – ${heure(fin)}`;
-  return `du ${dateCourte(debut)} au ${dateCourte(fin)}`;
+export function plage(debut: string, fin: string, tz?: string) {
+  if (jour(debut, tz) === jour(fin, tz)) return `${dateCourte(debut, tz)} · ${heure(debut, tz)} – ${heure(fin, tz)}`;
+  return `du ${dateCourte(debut, tz)} au ${dateCourte(fin, tz)}`;
 }
 
 export function ilya(iso: string) {
@@ -30,6 +42,7 @@ export const TYPES_ANNONCE: Record<AnnonceType, { libelle: string; classe: strin
   APPEL_BENEVOLAT: { libelle: "Bénévolat", classe: "bg-foret-soft text-foret", emoji: "🙋" },
   EVENEMENT: { libelle: "Évènement", classe: "bg-lilas text-[#5b3fc4]", emoji: "📅" },
   DON: { libelle: "Collecte de dons", classe: "bg-soleil-soft text-[#8a5a00]", emoji: "🎁" },
+  ACTIVITE: { libelle: "Activité", classe: "bg-[#ffe1d6] text-corail-dark", emoji: "🎉" },
 };
 
 export const STATUTS_CANDIDATURE: Record<StatutCandidature, { libelle: string; classe: string }> = {
@@ -62,9 +75,12 @@ export function couleurDe(texte: string) {
   return palette[h % palette.length];
 }
 
-/** Convertit une date ISO en valeur pour <input type="datetime-local">. */
-export function versInputDate(iso: string) {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+/** Convertit une date ISO en valeur pour <input type="datetime-local">, exprimée dans le fuseau `tz`. */
+export function versInputDate(iso: string, tz?: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    ...(tz ? { timeZone: tz } : {}),
+  }).formatToParts(new Date(iso));
+  const v = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
+  return `${v("year")}-${v("month")}-${v("day")}T${v("hour")}:${v("minute")}`;
 }
