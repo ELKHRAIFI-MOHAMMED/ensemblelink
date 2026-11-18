@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="md:col-span-2">
           <Logo clair />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
-            SolidarLink relie les associations et les citoyens qui veulent agir près de chez eux : une heure, une journée ou
+            EnsembleLink relie les associations et les citoyens qui veulent agir près de chez eux : une heure, une journée ou
             toute l&apos;année.
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-white/40">
-        SolidarLink · Projet de fin d&apos;études · Fait avec ❤️ pour l&apos;engagement citoyen
+        EnsembleLink · Version bêta de démonstration · Fait avec ❤️ pour l&apos;engagement citoyen
       </div>
     </footer>
   );

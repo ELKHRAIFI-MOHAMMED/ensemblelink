@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import { Suspense } from "react";
+import BandeauBeta from "@/components/BandeauBeta";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { ToastProvider } from "@/components/ui";
@@ -11,9 +12,9 @@ const bricolage = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: [
 const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: { default: "SolidarLink · Agir près de chez soi", template: "%s · SolidarLink" },
+  title: { default: "EnsembleLink · Agir ensemble, près de chez soi", template: "%s · EnsembleLink" },
   description:
-    "Trouvez une mission de bénévolat, participez à un évènement solidaire ou faites un don auprès d'associations vérifiées près de chez vous.",
+    "Version bêta. Trouvez une mission de bénévolat, participez à un évènement solidaire ou faites un don auprès d'associations vérifiées près de chez vous.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <AuthProvider>
           <ToastProvider>
+            <BandeauBeta />
             <Suspense fallback={<div className="h-16 border-b border-ligne/70 bg-creme" />}>
               <Header />
             </Suspense>

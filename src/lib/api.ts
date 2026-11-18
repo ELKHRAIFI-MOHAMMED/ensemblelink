@@ -1,7 +1,10 @@
 /* Client HTTP de l'API Django : ajoute le JWT, le renouvelle automatiquement et normalise les erreurs. */
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
-export const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://127.0.0.1:8000";
+export const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "";
+/** Temps réel par WebSocket si NEXT_PUBLIC_WS_URL est défini (local avec Daphne).
+ *  Sinon (bêta sur Vercel) : rafraîchissement automatique périodique. */
+export const TEMPS_REEL = WS_URL !== "";
 
 const ACCESS = "sl_access";
 const REFRESH = "sl_refresh";

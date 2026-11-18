@@ -7,7 +7,7 @@ import { couleurDe, initiales } from "@/lib/format";
 /* ---------------------------------------------------------------- Logo */
 export function Logo({ clair = false }: { clair?: boolean }) {
   return (
-    <Link href="/" className="group inline-flex items-center gap-2" aria-label="SolidarLink, accueil">
+    <Link href="/" className="group inline-flex items-center gap-2" aria-label="EnsembleLink, accueil">
       <span className="relative grid h-9 w-9 place-items-center rounded-xl bg-corail text-white shadow-carte transition group-hover:rotate-[-6deg]">
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
           <path d="M12 20.5s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.6-7.5 10-7.5 10Z" />
@@ -15,8 +15,9 @@ export function Logo({ clair = false }: { clair?: boolean }) {
         <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-creme bg-soleil" />
       </span>
       <span className={`font-display text-xl font-extrabold ${clair ? "text-white" : "text-ink"}`}>
-        Solidar<span className="text-corail">Link</span>
+        Ensemble<span className="text-corail">Link</span>
       </span>
+      <span className="rounded-full bg-soleil px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink">Bêta</span>
     </Link>
   );
 }

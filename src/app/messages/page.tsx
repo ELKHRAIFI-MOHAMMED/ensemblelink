@@ -4,11 +4,19 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar, Chargement, Modale, Vide, useToast } from "@/components/ui";
-import { api, wsUrl } from "@/lib/api";
+import { api, TEMPS_REEL, wsUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { dateLongue, heure, ilya, plage, TYPES_ANNONCE } from "@/lib/format";
 import type { Conversation, Groupe, MembreGroupe, Message, MessageGroupe, UserMini } from "@/lib/types";
 import Drapeau from "@/components/Drapeau";
+
+/** Remplace la liste seulement si elle a changé (évite de faire défiler le fil à chaque rafraîchissement). */
+function fusion(avant: Bulle[] | null, apres: Bulle[]) {
+  if (avant && avant.length === apres.length && avant.at(-1)?.id === apres.at(-1)?.id) return avant;
+  return apres;
+}
+
+const INTERVALLE_FIL = 4_000;
 
 interface Bulle {
   id: number;
@@ -254,9 +262,20 @@ function FilPrive({ contact, moiId, onNouveau }: { contact: UserMini; moiId: num
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    api<Message[]>(`/messages/${contact.id}/`)
-      .then((m) => setBulles(m.map((x) => ({ id: x.id, contenu: x.contenu, date: x.date_envoi, moi: x.is_own }))))
-      .catch(() => setBulles([]));
+    let nb = -1;
+    const charger = () =>
+      api<Message[]>(`/messages/${contact.id}/`)
+        .then((m) => {
+          if (nb !== -1 && m.length > nb) onNouveau();
+          nb = m.length;
+          setBulles((b) => fusion(b, m.map((x) => ({ id: x.id, contenu: x.contenu, date: x.date_envoi, moi: x.is_own }))));
+        })
+        .catch(() => setBulles((b) => b ?? []));
+    charger();
+    if (!TEMPS_REEL) {
+      const t = setInterval(charger, INTERVALLE_FIL);
+      return () => clearInterval(t);
+    }
     const socket = new WebSocket(wsUrl(`/ws/chat/${contact.id}/`));
     ws.current = socket;
     socket.onopen = () => setEnLigne(true);
@@ -293,7 +312,7 @@ function FilPrive({ contact, moiId, onNouveau }: { contact: UserMini; moiId: num
           <Avatar nom={contact.nom_affiche} src={contact.avatar} taille={38} />
           <div className="flex-1">
             {lienProfil ? <Link href={lienProfil} className="font-bold hover:text-corail">{contact.nom_affiche}</Link> : <p className="font-bold">{contact.nom_affiche}</p>}
-            <p className="text-xs text-ink-soft">{enLigne ? "🟢 Temps réel actif" : "Connexion…"}</p>
+            <p className="text-xs text-ink-soft">{TEMPS_REEL ? (enLigne ? "🟢 Temps réel actif" : "Connexion…") : "🔄 Mise à jour automatique"}</p>
           </div>
         </header>
       }
@@ -332,12 +351,22 @@ function FilGroupe({ id, moiId, onNouveau }: { id: number; moiId: number; onNouv
 
   useEffect(() => {
     chargerDetail();
-    api<MessageGroupe[]>(`/groupes/${id}/messages/`)
-      .then((m) => {
-        setBulles(m.map((x) => versBulle(x, moiId)));
-        onNouveau(); // met à jour les compteurs de non-lus
-      })
-      .catch(() => setBulles([]));
+    let dernierSysteme = -1;
+    const charger = (premier = false) =>
+      api<MessageGroupe[]>(`/groupes/${id}/messages/`)
+        .then((m) => {
+          setBulles((b) => fusion(b, m.map((x) => versBulle(x, moiId))));
+          const sys = m.filter((x) => x.systeme).length;
+          if (dernierSysteme !== -1 && sys > dernierSysteme) chargerDetail(); // arrivée, départ ou fermeture
+          dernierSysteme = sys;
+          if (premier) onNouveau(); // met à jour les compteurs de non-lus
+        })
+        .catch(() => setBulles((b) => b ?? []));
+    charger(true);
+    if (!TEMPS_REEL) {
+      const t = setInterval(() => charger(), INTERVALLE_FIL);
+      return () => clearInterval(t);
+    }
     const socket = new WebSocket(wsUrl(`/ws/groupe/${id}/`));
     ws.current = socket;
     socket.onopen = () => setEnLigne(true);

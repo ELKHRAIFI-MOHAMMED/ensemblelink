@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, wsUrl } from "@/lib/api";
+import { api, TEMPS_REEL, wsUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { ilya } from "@/lib/format";
 import type { Notification, Paginated } from "@/lib/types";
@@ -133,20 +133,31 @@ function Cloche() {
   const [nonLues, setNonLues] = useState(0);
   const toast = useToast();
   const wsRef = useRef<WebSocket | null>(null);
+  const derniere = useRef<number | null>(null);
 
   const charger = useCallback(async () => {
     try {
       const d = await api<Paginated<Notification> & { non_lues: number }>("/notifications/?page_size=8");
+      // Mode rafraîchissement : afficher un toast pour les nouvelles notifications
+      const plusRecente = d.results[0];
+      if (plusRecente && derniere.current !== null && plusRecente.id > derniere.current && !plusRecente.lue) {
+        toast(plusRecente.titre, "info");
+      }
+      derniere.current = Math.max(plusRecente?.id ?? 0, derniere.current ?? 0);
       setNotifs(d.results);
       setNonLues(d.non_lues);
     } catch {
       /* silencieux */
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     charger();
+    if (!TEMPS_REEL) {
+      const t = setInterval(charger, 30_000);
+      return () => clearInterval(t);
+    }
     let ferme = false;
     let essai = 0;
     const connecter = () => {
