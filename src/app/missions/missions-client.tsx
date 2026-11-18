@@ -98,8 +98,8 @@ export default function MissionsClient() {
       </div>
 
       {/* ----- pays */}
-      <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="Pays">
-        <span className="mr-1 text-xs font-bold uppercase tracking-wider text-ink-soft">Pays</span>
+      <div className="mt-4 items-center defile-x -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0" aria-label="Pays">
+        <span className="mr-1 shrink-0 self-center text-xs font-bold uppercase tracking-wider text-ink-soft">Pays</span>
         <Filtre actif={!paysActif} onClick={() => maj({ pays: null })}>🌍 Partout</Filtre>
         {PAYS_PRINCIPAUX.map((code) => (
           <Filtre key={code} actif={paysActif === code} onClick={() => maj({ pays: paysActif === code ? null : code, lat: null, lng: null, rayon_km: null })}>
@@ -109,14 +109,15 @@ export default function MissionsClient() {
       </div>
 
       {/* ----- pastilles type & catégorie */}
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 defile-x -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0" aria-label="Type">
         <Filtre actif={!typeActif} onClick={() => maj({ type: null })}>Tout</Filtre>
         {(Object.keys(TYPES_ANNONCE) as AnnonceType[]).map((t) => (
           <Filtre key={t} actif={typeActif === t} onClick={() => maj({ type: typeActif === t ? null : t })}>
             {TYPES_ANNONCE[t].emoji} {TYPES_ANNONCE[t].libelle}
           </Filtre>
         ))}
-        <span className="mx-1 hidden w-px bg-ligne sm:block" />
+      </div>
+      <div className="mt-2 defile-x -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0" aria-label="Catégorie">
         {categories?.map((c) => (
           <Filtre key={c.id} actif={catActive === String(c.id)} onClick={() => maj({ categorie: catActive === String(c.id) ? null : String(c.id) })}>
             {c.icone} {c.nom}
@@ -168,7 +169,7 @@ export default function MissionsClient() {
 
 function Filtre({ actif, onClick, children }: { actif: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} aria-pressed={actif} className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${actif ? "border-ink bg-ink text-white" : "border-ligne bg-white text-ink-soft hover:border-ink"}`}>
+    <button onClick={onClick} aria-pressed={actif} className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${actif ? "border-ink bg-ink text-white" : "border-ligne bg-white text-ink-soft hover:border-ink"}`}>
       {children}
     </button>
   );

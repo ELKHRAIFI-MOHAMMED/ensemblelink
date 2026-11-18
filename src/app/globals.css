@@ -71,6 +71,14 @@ h3,
 @utility pastille {
   @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
 }
+/* ligne de pastilles qui défile horizontalement (mobile), sans barre de défilement visible */
+@utility defile-x {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 @utility conteneur {
   @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
 }

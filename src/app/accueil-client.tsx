@@ -54,8 +54,8 @@ export function StatsLive() {
     <section className="conteneur relative">
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl2 border border-ligne bg-ligne shadow-carte md:grid-cols-5">
         {items.map(([v, l]) => (
-          <div key={l} className="bg-white px-6 py-6">
-            <p className="font-display text-3xl font-extrabold text-ink md:text-4xl">
+          <div key={l} className="bg-white px-4 py-4 last:col-span-2 sm:px-6 sm:py-6 md:last:col-span-1">
+            <p className="font-display text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
               {v ?? <span className="inline-block h-8 w-16 animate-pulse rounded bg-sable" />}
             </p>
             <p className="mt-1 text-sm text-ink-soft">{l}</p>

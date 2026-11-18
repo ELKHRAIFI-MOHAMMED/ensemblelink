@@ -31,7 +31,7 @@ export default function ChoixPosition({
   zoom?: number;
 }) {
   return (
-    <MapContainer center={lat && lng ? [lat, lng] : centre} zoom={lat ? 13 : zoom} style={{ height: 260, width: "100%" }}>
+    <MapContainer center={lat && lng ? [lat, lng] : centre} zoom={lat ? 13 : zoom} className="isolate" style={{ height: 260, width: "100%" }}>
       <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <Clic onChoix={onChoix} />
       {lat && lng && <Marker position={[lat, lng]} icon={icone} />}

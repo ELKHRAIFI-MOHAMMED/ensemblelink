@@ -76,9 +76,9 @@ export default function MessagesPage() {
   const groupeActif = groupes?.find((g) => String(g.id) === groupeId);
 
   return (
-    <div className="conteneur py-8">
-      <h1 className="mb-6 text-3xl font-extrabold">Messagerie</h1>
-      <div className="carte grid h-[calc(100vh-14rem)] max-h-[760px] min-h-[520px] overflow-hidden md:grid-cols-[320px_1fr]">
+    <div className="conteneur py-4 sm:py-8">
+      <h1 className={`mb-4 text-2xl font-extrabold sm:mb-6 sm:text-3xl ${selection ? "max-md:hidden" : ""}`}>Messagerie</h1>
+      <div className="carte grid h-[calc(100dvh-10rem)] max-h-[760px] min-h-[460px] grid-cols-[minmax(0,1fr)] overflow-hidden sm:h-[calc(100dvh-14rem)] md:grid-cols-[320px_minmax(0,1fr)]">
         <aside className={`flex min-h-0 flex-col border-r border-ligne ${selection ? "hidden md:flex" : ""}`}>
           <div className="flex gap-1 border-b border-ligne p-2" role="tablist">
             {([

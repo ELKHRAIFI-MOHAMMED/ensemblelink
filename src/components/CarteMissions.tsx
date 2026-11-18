@@ -35,7 +35,7 @@ export default function CarteMissions({ annonces, hauteur = 520 }: { annonces: A
   const points = geo.map((a) => [Number(a.latitude), Number(a.longitude)] as [number, number]);
 
   return (
-    <div className="carte overflow-hidden p-1.5">
+    <div className="carte isolate overflow-hidden p-1.5">
       <MapContainer center={[38, -30]} zoom={2} scrollWheelZoom style={{ height: hauteur, width: "100%" }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

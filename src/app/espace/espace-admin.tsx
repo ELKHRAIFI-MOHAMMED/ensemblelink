@@ -33,7 +33,7 @@ export default function EspaceAdmin() {
         <p className="text-sm font-bold uppercase tracking-widest text-corail">Administration</p>
         <h1 className="mt-1 text-3xl font-extrabold md:text-4xl">Tableau de bord</h1>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Stat valeur={d?.utilisateurs ?? "…"} libelle={`comptes (${d?.comptes_inactifs ?? 0} inactifs)`} />
         <Stat valeur={d?.associations ?? "…"} libelle="associations vérifiées" accent="text-foret" />
         <Stat valeur={d?.missions_actives ?? "…"} libelle="missions actives" />

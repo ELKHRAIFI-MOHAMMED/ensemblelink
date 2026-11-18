@@ -110,9 +110,9 @@ export function Alerte({ type = "erreur", children }: { type?: "erreur" | "succe
 
 export function Stat({ valeur, libelle, accent = "text-ink" }: { valeur: React.ReactNode; libelle: string; accent?: string }) {
   return (
-    <div className="carte p-5">
-      <p className={`font-display text-3xl font-extrabold ${accent}`}>{valeur}</p>
-      <p className="mt-1 text-sm text-ink-soft">{libelle}</p>
+    <div className="carte min-w-0 p-4 sm:p-5">
+      <p className={`font-display text-2xl font-extrabold sm:text-3xl ${accent}`}>{valeur}</p>
+      <p className="mt-1 text-xs text-ink-soft sm:text-sm">{libelle}</p>
     </div>
   );
 }

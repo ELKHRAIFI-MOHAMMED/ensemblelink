@@ -95,7 +95,7 @@ export default function EspaceAssociation() {
         <Alerte>La vérification a été refusée : {profil.motif_rejet}. <Link href="/espace/profil" className="font-semibold underline">Mettre à jour mon profil</Link></Alerte>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Stat valeur={stats.annonces_actives} libelle={`annonces actives / ${stats.annonces_total}`} />
         <Stat valeur={stats.candidatures_en_attente} libelle="candidatures à traiter" accent="text-corail" />
         <Stat valeur={stats.benevoles_mobilises} libelle="bénévoles mobilisés" accent="text-foret" />

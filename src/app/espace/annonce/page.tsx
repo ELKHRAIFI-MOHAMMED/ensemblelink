@@ -138,7 +138,7 @@ export default function FormAnnoncePage() {
       )}
 
       <form onSubmit={soumettre} className="mt-8 space-y-8">
-        <fieldset className="carte space-y-5 p-6">
+        <fieldset className="carte min-w-0 space-y-5 p-4 sm:p-6">
           <legend className="sr-only">Type</legend>
           {!estCitoyen && <p className="etiquette">Type d&apos;annonce</p>}
           <div className={`grid gap-3 sm:grid-cols-4 ${estCitoyen ? "hidden" : ""}`}>
@@ -166,7 +166,7 @@ export default function FormAnnoncePage() {
           </div>
         </fieldset>
 
-        <fieldset className="carte space-y-5 p-6">
+        <fieldset className="carte min-w-0 space-y-5 p-4 sm:p-6">
           <h2 className="font-display text-lg font-bold">Quand et où ?</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -226,7 +226,7 @@ export default function FormAnnoncePage() {
           </div>
         </fieldset>
 
-        <fieldset className="carte space-y-5 p-6">
+        <fieldset className="carte min-w-0 space-y-5 p-4 sm:p-6">
           <h2 className="font-display text-lg font-bold">
             {f.type === "DON" ? "Objectif de collecte" : f.type === "ACTIVITE" ? "Participants" : "Bénévoles"}
           </h2>

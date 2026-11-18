@@ -123,7 +123,7 @@ export default function MissionDetail() {
         </div>
       </section>
 
-      <div className="conteneur mt-10 grid gap-10 lg:grid-cols-[1fr_380px]">
+      <div className="conteneur mt-6 grid grid-cols-[minmax(0,1fr)] gap-8 pb-24 sm:mt-10 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:pb-0">
         {/* Contenu */}
         <div className="space-y-8">
           <div className="grid gap-3 sm:grid-cols-3">
@@ -196,7 +196,7 @@ export default function MissionDetail() {
 
         {/* Colonne d'action */}
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          <div className="carte p-6">
+          <div id="participer" className="carte scroll-mt-24 p-5 sm:p-6">
             {a.est_organisateur ? (
               <div className="space-y-3">
                 <p className="font-display text-lg font-bold">Vous organisez cette {estActivite ? "activité" : "annonce"}</p>
@@ -280,6 +280,15 @@ export default function MissionDetail() {
           )}
         </aside>
       </div>
+
+      {/* Mobile : bouton d'action toujours visible en bas de l'écran (la colonne d'action est sous le contenu) */}
+      {!fermee && !a.est_organisateur && !a.ma_candidature && (!me || estCitoyen) && (
+        <div className="fixed inset-x-0 bottom-0 z-[800] border-t border-ligne bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden">
+          <a href="#participer" className="btn-primary w-full">
+            {!me ? "Je m'inscris pour participer" : boutonInscription} ↓
+          </a>
+        </div>
+      )}
 
       <Modale ouverte={signaler} onFermer={() => setSignaler(false)} titre="Signaler cette annonce">
         <p className="mb-3 text-sm text-ink-soft">Contenu trompeur, lieu incorrect, comportement inapproprié… Expliquez-nous le problème.</p>

@@ -21,9 +21,11 @@ export default function BandeauBeta() {
       <span className="mr-1" aria-hidden>
         🧪
       </span>
-      <strong>EnsembleLink bêta</strong> : démo avec des données fictives (Maroc, France, Royaume-Uni, États-Unis, Canada).{" "}
-      <Link href="/connexion" className="font-semibold text-soleil underline underline-offset-2 hover:text-white">
-        Tester avec un compte de démo →
+      <strong>EnsembleLink bêta</strong> : démo avec des données fictives
+      <span className="max-sm:hidden"> (Maroc, France, Royaume-Uni, États-Unis, Canada)</span>.{" "}
+      <Link href="/connexion" className="whitespace-nowrap font-semibold text-soleil underline underline-offset-2 hover:text-white">
+        <span className="max-sm:hidden">Tester avec un compte de démo</span>
+        <span className="sm:hidden">Tester</span> →
       </Link>
       <button
         type="button"

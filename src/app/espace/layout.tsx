@@ -5,7 +5,8 @@ import EspaceSidebar from "@/components/EspaceSidebar";
 /** « Mon espace » : barre latérale (historique, activités créées, engagements…) + contenu de la page. */
 export default function EspaceLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-10">
+    // grid-cols-[minmax(0,1fr)] : sur mobile, la barre de liens (défilement horizontal) ne doit pas élargir la page
+    <div className="mx-auto grid w-full max-w-7xl grid-cols-[minmax(0,1fr)] gap-4 px-4 py-5 sm:gap-6 sm:px-6 sm:py-8 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-10">
       <Suspense fallback={<div className="hidden lg:block" />}>
         <EspaceSidebar />
       </Suspense>

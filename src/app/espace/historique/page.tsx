@@ -103,7 +103,7 @@ export default function HistoriquePage() {
 
       {/* Résumé cliquable */}
       {r && (
-        <div className={`grid gap-3 ${estCitoyen ? "grid-cols-2 md:grid-cols-5" : "grid-cols-2 md:grid-cols-3"}`}>
+        <div className={`grid gap-3 ${estCitoyen ? "grid-cols-2 md:grid-cols-5 [&>*:last-child]:col-span-2 md:[&>*:last-child]:col-span-1" : "grid-cols-2 md:grid-cols-3"}`}>
           {(estCitoyen
             ? ([
                 ["ORGANISEE", r.organisees, "activités créées", "text-corail"],

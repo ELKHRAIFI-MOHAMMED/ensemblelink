@@ -65,7 +65,7 @@ export default function EspaceCitoyen() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Stat valeur={`${nombre(stats.heures_benevolat)} h`} libelle="de bénévolat validées" accent="text-corail" />
         <Stat valeur={stats.missions_realisees} libelle="missions réalisées" accent="text-foret" />
         <Stat valeur={stats.dons_effectues} libelle="dons effectués" />

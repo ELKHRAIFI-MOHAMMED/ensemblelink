@@ -21,6 +21,7 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [menu, setMenu] = useState(false);
+  const [mobile, setMobile] = useState(false);
 
   const nom =
     me?.profil && "prenom" in me.profil
@@ -32,7 +33,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-[900] border-b border-ligne/70 bg-creme/85 backdrop-blur-md">
-      <div className="conteneur flex h-16 items-center gap-6">
+      <div className="conteneur flex h-16 items-center gap-3 sm:gap-6">
         <Logo />
         <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
           {LIENS.map((l) => (
@@ -48,12 +49,12 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2">
           {chargement ? (
-            <span className="h-9 w-24 animate-pulse rounded-full bg-sable" />
+            <span className="h-9 w-20 animate-pulse rounded-full bg-sable sm:w-24" />
           ) : me ? (
             <>
-              <Link href="/messages" className="relative rounded-full p-2 text-ink-soft hover:bg-sable" aria-label="Messages">
+              <Link href="/messages" className="relative hidden rounded-full p-2 text-ink-soft hover:bg-sable sm:block" aria-label="Messages">
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z" />
                 </svg>
@@ -62,7 +63,7 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setMenu((m) => !m)}
-                  className="flex items-center gap-2 rounded-full border border-ligne bg-white py-1 pl-1 pr-3 hover:border-ink"
+                  className="flex items-center gap-2 rounded-full border border-ligne bg-white p-1 hover:border-ink sm:pr-3"
                   aria-expanded={menu}
                   aria-haspopup="menu"
                 >
@@ -108,20 +109,54 @@ export default function Header() {
               <Link href="/connexion" className="btn-ghost btn-sm sm:px-5 sm:py-2.5 sm:text-sm">
                 Connexion
               </Link>
-              <Link href="/inscription" className="btn-primary btn-sm sm:px-5 sm:py-2.5 sm:text-sm">
+              <Link href="/inscription" className="btn-primary btn-sm max-sm:hidden sm:px-5 sm:py-2.5 sm:text-sm">
                 Devenir bénévole
               </Link>
             </>
           )}
+          <button
+            type="button"
+            onClick={() => setMobile((m) => !m)}
+            className="grid h-10 w-10 place-items-center rounded-full text-ink hover:bg-sable md:hidden"
+            aria-label={mobile ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={mobile}
+            aria-controls="menu-mobile"
+            data-menu-mobile
+          >
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+              {mobile ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
+          </button>
         </div>
       </div>
-      <nav className="conteneur flex gap-1 overflow-x-auto pb-2 md:hidden" aria-label="Navigation mobile">
-        {LIENS.map((l) => (
-          <Link key={l.href} href={l.href} className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-ink-soft">
-            {l.libelle}
-          </Link>
-        ))}
-      </nav>
+
+      {/* Menu mobile (< md) : navigation + accès au compte */}
+      {mobile && (
+        <nav id="menu-mobile" className="apparition border-t border-ligne/70 bg-creme md:hidden" aria-label="Navigation mobile">
+          <div className="conteneur grid gap-1 py-3">
+            {[...LIENS, ...(me ? [{ href: "/espace", libelle: "Mon espace" }, { href: "/messages", libelle: "Messagerie" }] : [])].map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setMobile(false)}
+                className={`rounded-xl px-4 py-3 text-base font-medium hover:bg-sable ${pathname === l.href ? "bg-sable text-ink" : "text-ink-soft"}`}
+              >
+                {l.libelle}
+              </Link>
+            ))}
+            {!me && !chargement && (
+              <div className="mt-2 grid grid-cols-2 gap-2 border-t border-ligne/70 pt-3">
+                <Link href="/connexion" onClick={() => setMobile(false)} className="btn-ghost">
+                  Connexion
+                </Link>
+                <Link href="/inscription" onClick={() => setMobile(false)} className="btn-primary">
+                  Devenir bénévole
+                </Link>
+              </div>
+            )}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }
@@ -203,7 +238,10 @@ function Cloche() {
         )}
       </button>
       {ouvert && (
-        <div className="carte apparition absolute right-0 mt-2 w-80 overflow-hidden" onMouseLeave={() => setOuvert(false)}>
+        <div
+          className="carte apparition fixed inset-x-3 top-16 overflow-hidden sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80"
+          onMouseLeave={() => setOuvert(false)}
+        >
           <div className="flex items-center justify-between border-b border-ligne px-4 py-3">
             <p className="font-display font-bold">Notifications</p>
             {nonLues > 0 && (

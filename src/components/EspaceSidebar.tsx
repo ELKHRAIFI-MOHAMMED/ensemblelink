@@ -77,7 +77,7 @@ export default function EspaceSidebar() {
   const peutPublier = citoyen || asso?.statut_verification === "VERIFIEE";
 
   return (
-    <aside className="lg:sticky lg:top-24 lg:self-start" aria-label="Navigation de mon espace">
+    <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start" aria-label="Navigation de mon espace">
       {/* Carte profil (desktop) */}
       <div className="carte mb-4 hidden items-center gap-3 p-4 lg:flex">
         <Avatar nom={nom} src={avatar} taille={44} carre={Boolean(asso)} />
